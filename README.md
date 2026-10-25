@@ -177,20 +177,35 @@ tests/test_missing_data.py::test_missing_actual_not_treated_as_zero PASSED
 
 ## 7. Deployment Instructions
 
-### Backend (Render / Railway / Fly.io / AWS)
-1. Deploy `backend` as a Docker web service using the included `Dockerfile`.
-2. Configure environment variables:
-   - `ALLOWED_ORIGINS`: Comma-separated list of allowed frontend domains (e.g. `https://wind-forecast-workbench.vercel.app`).
+### Option 1: Unified All-In-One Deployment (Single URL & Single Web Service)
+The repository includes a multi-stage root [`Dockerfile`](Dockerfile) that builds the React frontend with Node.js and packages it directly into the FastAPI Python backend. FastAPI serves the React SPA at `/` and the REST API at `/api/...`.
+- **Render / Railway / Fly.io / GCP Cloud Run**:
+  1. Create a new Web Service and link your GitHub repository: `hasinireddy-k/windworkbench`.
+  2. Select **Docker** environment (uses root `Dockerfile`).
+  3. Environment variables:
+     - `ELEXON_API_BASE`: `https://data.elexon.co.uk/bmrs/api/v1`
+     - `CACHE_ENABLED`: `true`
+  4. Deploy! You get a **single working URL** (e.g. `https://windworkbench.onrender.com`) containing both frontend and backend with zero CORS configuration needed.
+
+---
+
+### Option 2: Decoupled Two-Service Deployment (Frontend + Backend Separately)
+If you prefer deploying frontend and backend to distinct hosting platforms:
+
+**Backend (Render / Railway / Fly.io)**:
+1. Root Directory: `backend`
+2. Dockerfile: `backend/Dockerfile`
+3. Environment variables:
+   - `ALLOWED_ORIGINS`: Comma-separated list of allowed frontend domains (e.g. `https://windworkbench.vercel.app`).
    - `ELEXON_API_BASE`: `https://data.elexon.co.uk/bmrs/api/v1`
    - `CACHE_ENABLED`: `true`
-3. Health check path: `/api/health`.
 
-### Frontend (Vercel / Netlify / Cloudflare Pages)
-1. Set the root directory to `frontend`.
-2. Build command: `npm run build`.
-3. Output directory: `dist`.
+**Frontend (Vercel / Netlify / Cloudflare Pages)**:
+1. Root Directory: `frontend`
+2. Build command: `npm run build`
+3. Output directory: `dist`
 4. Environment variable:
-   - `VITE_API_BASE`: Set to the deployed backend URL (e.g., `https://your-backend.onrender.com`).
+   - `VITE_API_BASE`: Set to your deployed backend URL (e.g. `https://your-backend.onrender.com`).
 
 ---
 

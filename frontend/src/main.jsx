@@ -30,7 +30,12 @@ import {
 } from 'lucide-react';
 import './style.css';
 
-const API = import.meta.env.VITE_API_BASE || 'http://localhost:8000';
+const API =
+  import.meta.env.VITE_API_BASE !== undefined
+    ? import.meta.env.VITE_API_BASE
+    : typeof window !== 'undefined' && window.location.port === '5173'
+    ? 'http://localhost:8000'
+    : '';
 
 const fmt = (v, d = 1) =>
   v == null || !Number.isFinite(Number(v))
